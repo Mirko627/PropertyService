@@ -7,9 +7,9 @@ namespace PropertyService.ClientHttp.Clients
     public class PropertyClient : IPropertyClient
     {
         private readonly HttpClient _httpClient;
-        public PropertyClient(IHttpClientFactory httpClientFactory)
+        public PropertyClient(HttpClient httpClient)
         {
-            _httpClient = httpClientFactory.CreateClient("ApiClient");
+            _httpClient = httpClient;
         }
         public async Task<List<PropertyDto>> GetAllAsync()
         {
