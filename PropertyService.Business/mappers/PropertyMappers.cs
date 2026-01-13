@@ -13,7 +13,6 @@ namespace PropertyService.Business.mappers
             CreateMap<UpdatePropertyDto, Property>()
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.OwnerId, opt => opt.Ignore())
-                .ForMember(dest => dest.AgencyId, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
 
             CreateMap<Property, PropertyDto>();
