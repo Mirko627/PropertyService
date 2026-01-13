@@ -63,7 +63,7 @@ namespace PropertyService.ClientHttp.Clients
 
         private void AddAuthorizationHeader(HttpRequestMessage request)
         {
-            string authHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
+            string? authHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
 
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
             {
