@@ -14,6 +14,5 @@ namespace PropertyService.Shared.dtos
         public PropertyStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public int OwnerId { get; set; }
-        public int AgencyId { get; set; }
     }
 }

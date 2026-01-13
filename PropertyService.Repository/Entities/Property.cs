@@ -19,6 +19,5 @@ namespace PropertyService.Repository.Entities
         public PropertyStatus Status { get; set; } = PropertyStatus.Available;
         public DateTime CreatedAt { get; set; }
         public int OwnerId { get; set; }
-        public int AgencyId { get; set; }
     }
 }

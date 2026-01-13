@@ -1,54 +1,70 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PropertyService.Business.Interfaces;
 using PropertyService.Shared.dtos;
+using System.Security.Claims;
 
-namespace PropertyService.API.Controllers
+[Route("api/[controller]")]
+[ApiController]
+public class PropertyController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PropertyController : ControllerBase
+    private readonly IPropertyService _propertyService;
+
+    public PropertyController(IPropertyService propertyService)
     {
-        private readonly IPropertyService propertyService;
+        _propertyService = propertyService;
+    }
 
-        public PropertyController(IPropertyService propertyService)
-        {
-            this.propertyService = propertyService;
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            List<PropertyDto> properties = await propertyService.GetAllAsync();
-            return Ok(properties);
-        }
+    [HttpGet]
+    public async Task<ActionResult<List<PropertyDto>>> GetAll()
+    {
+        var properties = await _propertyService.GetAllAsync();
+        return Ok(properties);
+    }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            PropertyDto? p = await propertyService.GetPropertyByIdAsync(id);
-            if (p == null)
-                return NotFound();
-            return Ok(p);
-        }
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<PropertyDto>> GetById(int id)
+    {
+        var p = await _propertyService.GetPropertyByIdAsync(id);
+        return Ok(p);
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> Add([FromBody] CreatePropertyDto property)
-        {
-            await propertyService.AddAsync(property);
-            return Ok();
-        }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody]UpdatePropertyDto property)
-        {
-            await propertyService.UpdateAsync(id, property);
-            return Ok();
-        }
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> Add([FromBody] CreatePropertyDto property)
+    {
+        int userId = GetUserId();
+        await _propertyService.AddAsync(property, userId);
+        return Created();
+    }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            await propertyService.DeleteAsync(id);
-            return Ok();
-        }
+    [HttpPut("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdatePropertyDto property)
+    {
+        int userId = GetUserId();
+        await _propertyService.UpdateAsync(id, property, userId);
+        return Ok();
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize]
+    public async Task<IActionResult> Delete(int id)
+    {
+        int userId = GetUserId();
+        await _propertyService.DeleteAsync(id, userId);
+        return Ok();
+    }
+
+    private int GetUserId()
+    {
+        string? userIdClaim =
+            User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+            User.FindFirst("id")?.Value;
+
+        if (string.IsNullOrEmpty(userIdClaim))
+            throw new UnauthorizedAccessException("ID utente non trovato nel token");
+
+        return int.Parse(userIdClaim);
     }
 }
-

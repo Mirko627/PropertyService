@@ -9,65 +9,82 @@ namespace PropertyService.Business.Services
 {
     public class PropertyService : IPropertyService
     {
-        private readonly IPropertyRepository propertyRepository;
-        private readonly IPropertyStatusHistoryRepository propertyStatusHistoryRepository;
-        private readonly IMapper mapper;
+        private readonly IPropertyRepository _propertyRepository;
+        private readonly IPropertyStatusHistoryRepository _propertyStatusHistoryRepository;
+        private readonly IMapper _mapper;
 
         public PropertyService(IPropertyRepository propertyRepository, IPropertyStatusHistoryRepository propertyStatusHistoryRepository, IMapper mapper)
         {
-            this.propertyRepository = propertyRepository;
-            this.propertyStatusHistoryRepository = propertyStatusHistoryRepository;
-            this.mapper = mapper;
+            _propertyRepository = propertyRepository;
+            _propertyStatusHistoryRepository = propertyStatusHistoryRepository;
+            _mapper = mapper;
         }
 
         public async Task<List<PropertyDto>> GetAllAsync()
         {
-            List<Property> properties = await propertyRepository.GetAllAsync();
-            List<PropertyDto> propertyDtos = mapper.Map<List<PropertyDto>>(properties);
-            return propertyDtos;
+            List<Property> properties = await _propertyRepository.GetAllAsync();
+            return _mapper.Map<List<PropertyDto>>(properties);
         }
 
         public async Task<PropertyDto> GetPropertyByIdAsync(int id)
         {
-            Property property = await propertyRepository.GetPropertyById(id);
-            PropertyDto propertyDto = mapper.Map<PropertyDto>(property);
-            return propertyDto;
+            Property property = await _propertyRepository.GetPropertyById(id) ?? throw new KeyNotFoundException($"Proprietà con ID {id} non trovata.");
+
+            return _mapper.Map<PropertyDto>(property);
         }
-        public async Task AddAsync(CreatePropertyDto property)
+
+        public async Task AddAsync(CreatePropertyDto dto, int userId)
         {
-            Property p = mapper.Map<Property>(property);
+            Property p = _mapper.Map<Property>(dto);
+
+            p.OwnerId = userId;
             p.Status = PropertyStatus.Available;
-            p.CreatedAt = DateTime.Now;
-            await propertyRepository.AddAsync(p);
-            return;
+            p.CreatedAt = DateTime.UtcNow;
+
+            await _propertyRepository.AddAsync(p);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task UpdateAsync(int id, UpdatePropertyDto dto, int userId)
         {
-           await propertyRepository.DeleteAsync(id);
+            Property property = await _propertyRepository.GetPropertyById(id) ?? throw new KeyNotFoundException($"Proprietà con ID {id} non trovata.");
+
+            if (property.OwnerId != userId) throw new UnauthorizedAccessException("Non hai i permessi per modificare questa proprietà.");
+
+            _mapper.Map(dto, property);
+
+            await _propertyRepository.UpdateAsync(property);
         }
 
-        public async Task UpdateAsync(int id, UpdatePropertyDto property)
+        public async Task DeleteAsync(int id, int userId)
         {
-            Property p = await propertyRepository.GetPropertyById(id);
-            mapper.Map(property, p);
-            await propertyRepository.UpdateAsync(p);
+            Property property = await _propertyRepository.GetPropertyById(id) ?? throw new KeyNotFoundException($"Proprietà con ID {id} non trovata.");
+
+            if (property.OwnerId != userId) throw new UnauthorizedAccessException("Non hai i permessi per modificare questa proprietà.");
+
+            await _propertyRepository.DeleteAsync(id);
         }
-        public async Task ChangeStatusAsync(int id, ChangePropertyStatusDto dto)
+
+        public async Task ChangeStatusAsync(int id, ChangePropertyStatusDto dto, int userId)
         {
-            Property p = await propertyRepository.GetPropertyById(id);
-            if (dto.NewStatus == p.Status)
+            Property property = await _propertyRepository.GetPropertyById(id) ?? throw new KeyNotFoundException($"Proprietà con ID {id} non trovata.");
+
+            if (property.OwnerId != userId) throw new UnauthorizedAccessException("Non hai i permessi per modificare questa proprietà.");
+
+            if (dto.NewStatus == property.Status)
                 return;
-            PropertyStatusHistory statusHistory = new PropertyStatusHistory
+
+            var statusHistory = new PropertyStatusHistory
             {
-                Property = p,
-                OldStatus = p.Status,
+                Property = property,
+                OldStatus = property.Status,
                 NewStatus = dto.NewStatus,
-                ChangedAt = DateTime.Now
+                ChangedAt = DateTime.UtcNow
             };
-            p.Status = dto.NewStatus;
-            await propertyRepository.UpdateAsync(p);
-            await propertyStatusHistoryRepository.AddAsync(statusHistory);
+
+            property.Status = dto.NewStatus;
+
+            await _propertyRepository.UpdateAsync(property);
+            await _propertyStatusHistoryRepository.AddAsync(statusHistory);
         }
     }
 }

@@ -6,9 +6,9 @@ namespace PropertyService.Business.Interfaces
     {
         Task<List<PropertyDto>> GetAllAsync();
         Task<PropertyDto> GetPropertyByIdAsync(int id);
-        Task AddAsync(CreatePropertyDto property);
-        Task UpdateAsync(int id, UpdatePropertyDto property);
-        Task DeleteAsync(int id);
-        Task ChangeStatusAsync(int id, ChangePropertyStatusDto dto);
+        Task AddAsync(CreatePropertyDto property, int userId);
+        Task UpdateAsync(int id, UpdatePropertyDto property, int userId);
+        Task DeleteAsync(int id, int userId);
+        Task ChangeStatusAsync(int id, ChangePropertyStatusDto dto, int userId);
     }
 }
