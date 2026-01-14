@@ -95,11 +95,13 @@ using (var scope = app.Services.CreateScope())
             db.Database.Migrate();
             break;
         }
-        catch
+        catch (Exception ex)
         {
             retries--;
+            Console.WriteLine($"Retrying DB migration. Attempts left: {retries}. Error: {ex.Message}");
             Thread.Sleep(3000);
         }
+
     }
 }
 
