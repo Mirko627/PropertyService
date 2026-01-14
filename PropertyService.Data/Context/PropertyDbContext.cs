@@ -16,7 +16,9 @@ namespace PropertyService.Data.Context
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+            builder.Entity<Property>()
+                    .Property(p => p.Price)
+                    .HasColumnType("decimal(18,2)");
             builder.Entity<Property>(entity =>
             {
                 entity.Property(p => p.Status)
