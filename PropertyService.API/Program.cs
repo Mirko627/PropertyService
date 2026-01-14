@@ -85,7 +85,7 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<UserDBContext>();
+    var db = scope.ServiceProvider.GetRequiredService<PropertyDbContext>();
 
     var retries = 10;
     while (retries > 0)
