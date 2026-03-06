@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<PackageId>Mirko.PropertyService.Shared</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Mirko Ferrari</Authors>
+		<RepositoryUrl>https://github.com/Mirko627/PropertyService</RepositoryUrl>
+	</PropertyGroup>
+
+</Project>
