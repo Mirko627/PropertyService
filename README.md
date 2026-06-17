@@ -31,7 +31,7 @@ http://localhost:7801
 Documentazione Swagger disponibile qui:
 
 ```
-http://localhost:7801/swagger-ui/index.html
+http://http://localhost:7801/swagger/index.html
 ```
 
 ## Integrazioni
