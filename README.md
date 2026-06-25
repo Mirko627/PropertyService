@@ -143,7 +143,7 @@ Questo consente di tracciare l'evoluzione dell'immobile nel tempo.
 | offer-events | OfferAccepted | Offer Service | Aggiorna lo stato dell'immobile quando un'offerta viene accettata       |
 | offer-events | OfferRejected | Offer Service | Aggiorna lo stato dell'immobile in seguito al rifiuto di un'offerta     |
 
-### Gestione degli eventi
+#### Gestione degli eventi
 
 Il servizio utilizza gli eventi provenienti dall'Offer Service per mantenere sincronizzato lo stato degli immobili.
 
