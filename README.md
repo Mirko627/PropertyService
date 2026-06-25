@@ -133,7 +133,9 @@ Questo consente di tracciare l'evoluzione dell'immobile nel tempo.
 
 ## Integrazioni
 
-### Eventi Kafka consumati
+### Kafka
+
+#### Eventi Kafka consumati
 
 | Topic        | Evento        | Provenienza   | Descrizione                                                             |
 | ------------ | ------------- | ------------- | ----------------------------------------------------------------------- |
